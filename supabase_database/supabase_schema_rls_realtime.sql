@@ -93,4 +93,34 @@ create trigger on_auth_user_created
 after insert on auth.users
 for each row execute function public.handle_new_user();
 
+-- 5) brands table (booking catalog)
+create table if not exists public.brands (
+  id uuid primary key default gen_random_uuid(),
+  name text unique not null,
+  logo_url text,
+  created_at timestamptz not null default now()
+);
+
+-- RLS: authenticated users can read brands.
+alter table public.brands enable row level security;
+
+drop policy if exists "brands_select_authenticated" on public.brands;
+create policy "brands_select_authenticated"
+on public.brands
+for select
+to authenticated
+using (true);
+
+-- Seed default mobile brands (id auto-generated)
+insert into public.brands (name) values ('Samsung') on conflict (name) do nothing;
+insert into public.brands (name) values ('Apple') on conflict (name) do nothing;
+insert into public.brands (name) values ('Xiaomi') on conflict (name) do nothing;
+insert into public.brands (name) values ('OnePlus') on conflict (name) do nothing;
+insert into public.brands (name) values ('Vivo') on conflict (name) do nothing;
+insert into public.brands (name) values ('Oppo') on conflict (name) do nothing;
+insert into public.brands (name) values ('Realme') on conflict (name) do nothing;
+insert into public.brands (name) values ('Motorola') on conflict (name) do nothing;
+insert into public.brands (name) values ('Nokia') on conflict (name) do nothing;
+insert into public.brands (name) values ('Google Pixel') on conflict (name) do nothing;
+
 commit;
